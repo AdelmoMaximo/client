@@ -1,0 +1,40 @@
+steps:
+  # Passo 1: Constrói a imagem com o caminho completo (incluindo o nome da imagem no final).
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - "build"
+      - "-t"
+      - "us-central1-docker.pkg.dev/pass-client/ecommerce-pass-app/ecommerce-pass-app:$SHORT_SHA" # <-- CORREÇÃO AQUI
+      - "."
+
+  # Passo 2: Envia a imagem para o repositório.
+  - name: "gcr.io/cloud-builders/docker"
+    args: [
+        "push",
+        "us-central1-docker.pkg.dev/pass-client/ecommerce-pass-app/ecommerce-pass-app:$SHORT_SHA",
+      ] # <-- CORREÇÃO AQUI
+
+  # Passo 3: Substitui o placeholder no deployment.yaml com o caminho completo.
+  - name: "gcr.io/cloud-builders/gcloud"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        sed -i "s|__IMAGE__|us-central1-docker.pkg.dev/pass-client/ecommerce-pass-app/ecommerce-pass-app:$SHORT_SHA|g" k8s/deployment.yaml
+
+  # Passo 4: Aplica as configurações ao cluster GKE.
+  - name: "gcr.io/cloud-builders/gke-deploy"
+    args:
+      - "run"
+      - "--filename=k8s/"
+      - "--location=us-central1"
+      - "--cluster=pass-client-cluster"
+      - "--project=pass-client"
+
+# Define a imagem com o caminho completo.
+images:
+  - "us-central1-docker.pkg.dev/pass-client/ecommerce-pass-app/ecommerce-pass-app:$SHORT_SHA"
+
+# Opções de configuração do build.
+options:
+  logging: CLOUD_LOGGING_ONLY
