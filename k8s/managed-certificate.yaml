@@ -4,4 +4,4 @@ metadata:
   name: ecommerce-pass-certificate
 spec:
   domains:
-    - ecommerce.pass.business
+    - ecommerce.pass.partners

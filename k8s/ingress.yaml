@@ -11,7 +11,7 @@ metadata:
 spec:
   rules:
     # Aqui você define o domínio principal que será usado para acessar sua loja.
-    - host: "ecommerce.pass.business"
+    - host: "ecommerce.pass.partners"
       http:
         paths:
           - path: /
